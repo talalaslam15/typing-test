@@ -9,8 +9,9 @@ function App() {
   const [inCorrectLetters, setInCorrectLetters] = useState<number[]>([]);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [isComplete, setIsComplete] = useState<boolean>(false);
-  const [wordCount, setWordCount] = useState<number>(0);
   const [start, setStart] = useState<boolean>(false);
+  const [wpm, setWpm] = useState<number>(0);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (currentLetterIndex === 0 && e.key === currentLetter) {
@@ -21,7 +22,9 @@ function App() {
       if (e.key === currentLetter) {
         setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       } else {
-        setInCorrectLetters((prev) => [...prev, currentLetterIndex]);
+        //todo
+        if (!inCorrectLetters.includes(currentLetterIndex))
+          setInCorrectLetters((prev) => [...prev, currentLetterIndex]);
       }
       if (e.key === "Escape") {
         setCurrentLetterIndex(0);
@@ -30,7 +33,7 @@ function App() {
         setStart(false);
         setIsComplete(false);
       }
-      if (currentLetterIndex === words.length - 1) {
+      if (currentLetterIndex === words.length - 1 && e.key === currentLetter) {
         setWords(randomWords(10).join(" "));
         setInCorrectLetters([]);
         setCurrentLetterIndex(0);
@@ -38,11 +41,15 @@ function App() {
         setStart(false);
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keypress", handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keypress", handleKeyDown);
     };
-  }, [currentLetter]);
+  }, [currentLetterIndex]);
+  // useEffect(() => {
+  //   console.log("inCorrectLetters", inCorrectLetters);
+  // }, [inCorrectLetters]);
+
   useEffect(() => {
     if (start) {
       if (isComplete) {
@@ -55,20 +62,18 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [start, isComplete]);
+
   useEffect(() => {
     if (isComplete) {
       const wordArray = words.split(" ");
       const numWords = wordArray.length;
-      setWordCount(numWords);
+      setWpm(Number(((numWords / elapsedTime) * 60).toFixed(2)));
     }
   }, [isComplete, words]);
-  let wpm;
-  if (isComplete) {
-    wpm = ((wordCount / elapsedTime) * 60).toFixed(2);
-  }
+
   return (
     <div className="App">
-      <h2>
+      <h2 style={{ fontWeight: 400 }}>
         {words.split("").map((letter, index) => (
           <span
             key={index}
@@ -79,7 +84,7 @@ function App() {
                 : index < currentLetterIndex
                 ? "#34eb7d"
                 : "white",
-              backgroundColor: index === currentLetterIndex ? "#ffffff44" : "",
+              backgroundColor: index === currentLetterIndex ? "#fff4" : "",
             }}
           >
             {letter}
@@ -87,7 +92,7 @@ function App() {
         ))}
       </h2>
       <h1>{currentLetter === " " ? "space" : currentLetter}</h1>
-      Time: {elapsedTime} seconds | WPM: {wpm}
+      Speed: {wpm} wpm
     </div>
   );
 }
