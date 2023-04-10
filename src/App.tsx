@@ -11,6 +11,7 @@ function App() {
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [start, setStart] = useState<boolean>(false);
   const [wpm, setWpm] = useState<number>(0);
+  const [correctLetters, setCorrectLetters] = useState<number>(0);
   // const [ignoreMistakes, setIgnoreMistakes] = useState<boolean>(false);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
         setIsComplete(false);
       }
       if (currentLetterIndex === words.length - 1 && e.key === currentLetter) {
+        setCorrectLetters(words.length - inCorrectLetters.length);
         setWords(randomWords(10).join(" "));
         setInCorrectLetters([]);
         setCurrentLetterIndex(0);
@@ -55,24 +57,17 @@ function App() {
 
   useEffect(() => {
     if (start) {
-      if (isComplete) {
-        setStart(false);
-        return;
-      }
       const interval = setInterval(() => {
         setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [start, isComplete]);
+  }, [start]);
 
   useEffect(() => {
-    if (isComplete) {
-      const wordArray = words.split(" ");
-      const numWords = wordArray.length;
-      setWpm(Number(((numWords / elapsedTime) * 60).toFixed(2)));
-    }
-  }, [isComplete, words]);
+    isComplete &&
+      setWpm(Number(((correctLetters / 5 / elapsedTime) * 60).toFixed(2)));
+  }, [isComplete]);
 
   return (
     <div className="App">
@@ -94,7 +89,7 @@ function App() {
           </span>
         ))}
       </h2>
-      <h1>{currentLetter === " " ? "space" : currentLetter}</h1>
+      {/* <h1>{currentLetter === " " ? "space" : currentLetter}</h1> */}
       Speed: {wpm} wpm
     </div>
   );
