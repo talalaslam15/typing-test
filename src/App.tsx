@@ -11,6 +11,7 @@ function App() {
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [start, setStart] = useState<boolean>(false);
   const [wpm, setWpm] = useState<number>(0);
+  // const [ignoreMistakes, setIgnoreMistakes] = useState<boolean>(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -22,9 +23,14 @@ function App() {
       if (e.key === currentLetter) {
         setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       } else {
-        //todo
-        if (!inCorrectLetters.includes(currentLetterIndex))
-          setInCorrectLetters((prev) => [...prev, currentLetterIndex]);
+        setInCorrectLetters((prev) => {
+          if (prev.includes(currentLetterIndex)) {
+            return prev;
+          } else {
+            return [...prev, currentLetterIndex];
+          }
+        });
+        // ignoreMistakes && setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       }
       if (e.key === "Escape") {
         setCurrentLetterIndex(0);
@@ -41,14 +47,11 @@ function App() {
         setStart(false);
       }
     };
-    document.addEventListener("keypress", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("keypress", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [currentLetterIndex]);
-  // useEffect(() => {
-  //   console.log("inCorrectLetters", inCorrectLetters);
-  // }, [inCorrectLetters]);
 
   useEffect(() => {
     if (start) {
