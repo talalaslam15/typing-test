@@ -24,13 +24,11 @@ function App() {
       if (e.key === currentLetter) {
         setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       } else {
-        setInCorrectLetters((prev) => {
-          if (prev.includes(currentLetterIndex)) {
-            return prev;
-          } else {
-            return [...prev, currentLetterIndex];
-          }
-        });
+        setInCorrectLetters((prev) =>
+          prev.includes(currentLetterIndex)
+            ? prev
+            : [...prev, currentLetterIndex]
+        );
         // ignoreMistakes && setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       }
       if (e.key === "Escape") {
