@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import randomWords from "random-words";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { Box, IconButton } from "@mui/material";
 
 function App() {
   const [words, setWords] = useState<string>(randomWords(10).join(" "));
@@ -12,14 +14,27 @@ function App() {
   const [start, setStart] = useState<boolean>(false);
   const [wpm, setWpm] = useState<number>(0);
   const [correctLetters, setCorrectLetters] = useState<number>(0);
-  // const [ignoreMistakes, setIgnoreMistakes] = useState<boolean>(false);
+  const containerRef = useRef<HTMLButtonElement>(null);
 
+  // const [ignoreMistakes, setIgnoreMistakes] = useState<boolean>(false);
+  const reset = () => {
+    setCurrentLetterIndex(0);
+    setInCorrectLetters([]);
+    setElapsedTime(0);
+    setStart(false);
+    setIsComplete(false);
+  };
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (currentLetterIndex === 0 && e.key === currentLetter) {
         setElapsedTime(0);
         setIsComplete(false);
         setStart(true);
+      }
+      // focus on the icon button when the tab key is pressed
+      if (e.key === "Tab") {
+        e.preventDefault();
+        containerRef.current?.focus();
       }
       if (e.key === currentLetter) {
         setCurrentLetterIndex((prevIndex) => prevIndex + 1);
@@ -32,11 +47,7 @@ function App() {
         // ignoreMistakes && setCurrentLetterIndex((prevIndex) => prevIndex + 1);
       }
       if (e.key === "Escape") {
-        setCurrentLetterIndex(0);
-        setInCorrectLetters([]);
-        setElapsedTime(0);
-        setStart(false);
-        setIsComplete(false);
+        reset();
       }
       if (currentLetterIndex === words.length - 1 && e.key === currentLetter) {
         setCorrectLetters(words.length - inCorrectLetters.length);
@@ -89,6 +100,24 @@ function App() {
       </h2>
       {/* <h1>{currentLetter === " " ? "space" : currentLetter}</h1> */}
       Speed: {wpm} wpm
+      <Box>
+        <IconButton
+          tabIndex={0}
+          ref={containerRef}
+          onClick={(e) => {
+            e.currentTarget.blur();
+            reset();
+          }}
+          sx={{
+            "&:hover": {
+              color: "white",
+              bgcolor: "#fff4",
+            },
+          }}
+        >
+          <RefreshIcon style={{ color: "white" }} />
+        </IconButton>
+      </Box>
     </div>
   );
 }
