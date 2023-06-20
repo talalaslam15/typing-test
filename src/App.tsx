@@ -52,10 +52,6 @@ function App() {
     if (e.key === currentLetter) {
       setCurrentLetterIndex((prevIndex) => prevIndex + 1);
     } else {
-      // if (ignoreMistakes && currentLetterIndex === words.length - 1) {
-      //   restart();
-      //   return;
-      // }
       setInCorrectLetters((prev) =>
         prev.includes(currentLetterIndex) ? prev : [...prev, currentLetterIndex]
       );
